@@ -67,6 +67,12 @@ cd frontend
 ng serve
 ```
 
+## Fill up the vector database for RAG:
+```bash
+cd backend
+python init_chroma.py
+```
+
 ## Access
 
 | Service  | URL                   |
@@ -102,3 +108,9 @@ Response:
 ```
 
 Available styles: `simple`, `detailed`, `step_by_step`, `visual`, `formal` - TODO
+
+## Examples
+
+```bash
+curl -X POST http://localhost:5000/api/getResponse -H "Content-Type: application/json" -d "{\"chatId\": \"test123\", \"message\": \"How do I solve a quadratic equation?\", \"preference\": \"step_by_step\", \"lastMessage\": \"\"}"
+```
