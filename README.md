@@ -34,10 +34,6 @@ cd capstone
 cd backend
 python -m venv venv
 
-# On Mac/Linux:
-source venv/bin/activate
-
-# On Windows:
 venv\Scripts\activate
 
 pip install -r requirements.txt
@@ -61,7 +57,7 @@ npm start
 **Backend** (from `backend/` folder with venv activated):
 ```bash
 cd backend
-source venv/bin/activate  # Mac/Linux
+venv\Scripts\activate
 python app.py
 ```
 
