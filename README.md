@@ -44,7 +44,6 @@ cd ../frontend
 npm install
 ```
 
-## .env file
 ## Environment Variables
 
 Create a `.env` file in the `backend/` folder with the following structure:
