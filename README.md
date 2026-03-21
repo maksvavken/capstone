@@ -44,6 +44,45 @@ cd ../frontend
 npm install
 ```
 
+## .env file
+## Environment Variables
+
+Create a `.env` file in the `backend/` folder with the following structure:
+```
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=hf.co/malomorgen/finetuned-llama3-math-gguf
+```
+
+## Running the LLM Locally with Ollama
+
+### Prerequisites
+- [Ollama](https://ollama.com/download) installed on your machine
+
+### 0. Login into HuggingFace
+```bash
+ollama login huggingface
+```
+Offer your HuggingFace key
+
+### 1. Download and convert the model from HuggingFace
+```bash
+ollama run phi3:mini #input your model's name
+```
+
+This will automatically pull the model from HuggingFace and serve it locally.
+
+### 2. Verify Ollama is running
+```bash
+ollama list
+```
+
+You should see `phi3:mini` in the list.
+
+### 3. Ollama runs on
+```
+http://localhost:11434
+```
+
 ## Running the project
 
 ### Option A — Run both together (from the `frontend/` folder)
