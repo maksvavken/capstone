@@ -107,7 +107,14 @@ Response:
 }
 ```
 
-Available styles: `simple`, `detailed`, `step_by_step`, `visual`, `formal` - TODO
+Available styles: `short and simple`, `short and technical`, `step_by_step`, `long and simple`, `long and technical`
+
+## Create the DPO dataset:
+```bash
+cd backend
+venv\Scripts\activate
+python create_orpo_dataset.py
+```
 
 ## Examples
 
