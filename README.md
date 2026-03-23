@@ -15,8 +15,9 @@ capstone/
 ├── backend/         # Flask API + RAG system
 │   ├── app.py
 │   └── requirements.txt
-├── frontend/        # Angular app
-│   └── ...
+├── frontend/        # plain HTML/CSS
+│   |── chatbot.html
+|   └── README.md
 ├── .gitignore
 └── README.md
 ```
