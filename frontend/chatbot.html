@@ -26,7 +26,6 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
-
 .shell{display:flex;height:100vh;overflow:hidden}
 
 /* Sidebar */
@@ -50,15 +49,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex
 .chat-item:hover .ci-delete{opacity:1}
 .ci-delete:hover{color:var(--red)!important;opacity:1!important}
 
-/* Sidebar bottom */
-.sidebar-bottom{padding:12px 16px;border-top:1px solid var(--border-d);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
-.field-label{font-size:9px;letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
-.sb-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--cyan);font-family:inherit;font-size:10px;padding:6px 8px;border-radius:var(--r);outline:none}
-.sb-input:focus{border-color:var(--cyan)}
-.sb-input.model{color:var(--amber)}
-.sb-input.model:focus{border-color:var(--amber)}
-
-/* Pref badge */
+/* Pref badge in sidebar */
 .pref-section{padding:12px 16px;border-top:1px solid var(--border-d);flex-shrink:0;display:none}
 .pref-badge{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--t2);padding:3px 0}
 .pref-badge span:last-child{color:var(--amber);font-weight:500}
@@ -86,14 +77,13 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex
 .msg-header{display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:.1em}
 .msg-role{font-weight:600}
 .msg.user .msg-role{color:var(--cyan)}
-.msg.bot .msg-role{color:var(--amber)}
-.msg.err .msg-role{color:var(--red)}
-.msg-rag{font-size:9px;color:var(--green);border:1px solid var(--green);padding:1px 5px;border-radius:2px;letter-spacing:.06em;opacity:.75}
+.msg.bot  .msg-role{color:var(--amber)}
+.msg.err  .msg-role{color:var(--red)}
 .msg-ts{color:var(--t3);font-size:10px;margin-left:auto}
 .msg-body{padding:11px 15px;border-radius:var(--r);font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
 .msg.user .msg-body{background:var(--bg-e);border:1px solid var(--border);border-top-right-radius:2px}
-.msg.bot .msg-body{background:var(--bg-s);border:1px solid var(--border);border-top-left-radius:2px}
-.msg.err .msg-body{border-color:var(--red);color:var(--red)}
+.msg.bot  .msg-body{background:var(--bg-s);border:1px solid var(--border);border-top-left-radius:2px}
+.msg.err  .msg-body{border-color:var(--red);color:var(--red)}
 .typing-wrap{align-self:flex-start;display:flex;flex-direction:column;gap:5px}
 .typing{display:flex;gap:5px;padding:13px 15px;background:var(--bg-s);border:1px solid var(--border);border-radius:var(--r);border-top-left-radius:2px;width:fit-content}
 .typing span{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:bounce 1.2s ease-in-out infinite}
@@ -113,36 +103,27 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex
 .footer-hint{font-size:9px;color:var(--t3);letter-spacing:.08em;margin-top:7px;text-align:right}
 
 /* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px);animation:fadeIn .2s ease}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
 .modal-overlay.hidden{display:none}
-.modal{background:var(--bg-s);border:1px solid var(--border);border-radius:6px;width:480px;max-width:calc(100vw - 32px);animation:slideUp .22s ease;overflow:hidden}
+.modal{background:var(--bg-s);border:1px solid var(--border);border-radius:6px;width:500px;max-width:calc(100vw - 32px);animation:slideUp .22s ease;overflow:hidden}
 .modal-header{padding:22px 24px 18px;border-bottom:1px solid var(--border-d);display:flex;align-items:center;gap:10px}
 .modal-hex{font-size:20px;color:var(--amber);filter:drop-shadow(0 0 5px var(--amber))}
 .modal-title{font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--t1)}
 .modal-subtitle{font-size:10px;color:var(--t3);letter-spacing:.06em;margin-top:2px}
-.modal-steps{padding:0 24px 20px}
-.step{display:none;animation:fadeUp .18s ease}
-.step.active{display:block}
-.step-label{font-size:9px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin:20px 0 12px}
-.step-question{font-size:13px;color:var(--t1);margin-bottom:16px;line-height:1.6}
-.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.opt-btn{background:var(--bg);border:1px solid var(--border);color:var(--t2);font-family:inherit;font-size:11px;letter-spacing:.05em;padding:14px 12px;border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-.opt-btn:hover{border-color:var(--amber-dim);color:var(--t1);background:var(--bg-e)}
-.opt-btn.selected{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
-.opt-icon{font-size:18px}
-.opt-label{font-size:11px;font-weight:500}
-.opt-desc{font-size:9px;color:var(--t3);line-height:1.4}
-.opt-btn.selected .opt-desc{color:var(--amber-dim);filter:brightness(2)}
-.step-progress{display:flex;gap:5px;margin:18px 0 4px}
-.prog-dot{height:2px;flex:1;background:var(--border);border-radius:1px;transition:background .2s}
-.prog-dot.done{background:var(--amber)}
-.modal-footer{padding:14px 24px 20px;display:flex;justify-content:space-between;align-items:center}
-.btn-modal-back{background:none;border:none;color:var(--t3);font-family:inherit;font-size:11px;cursor:pointer;padding:0;transition:color .15s}
-.btn-modal-back:hover{color:var(--t1)}
-.btn-modal-back:disabled{opacity:.2;cursor:default}
-.btn-modal-next{background:var(--amber);border:none;color:#000;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.1em;padding:9px 20px;border-radius:var(--r);cursor:pointer;transition:all .15s}
-.btn-modal-next:hover{background:#ffb800}
-.btn-modal-next:disabled{background:var(--t3);color:var(--bg);cursor:default}
+.modal-body{padding:24px}
+.pref-question{font-size:12px;color:var(--t2);letter-spacing:.08em;margin-bottom:14px;text-transform:uppercase}
+.pref-grid{display:grid;gap:8px;margin-bottom:24px}
+.pref-grid.cols2{grid-template-columns:1fr 1fr}
+.pref-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.pref-opt{background:var(--bg);border:1px solid var(--border);color:var(--t2);font-family:inherit;font-size:11px;padding:12px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;text-align:center;line-height:1.5}
+.pref-opt:hover{border-color:var(--amber-dim);color:var(--t1);background:var(--bg-e)}
+.pref-opt.selected{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.pref-opt-name{font-weight:600;font-size:12px;display:block;margin-bottom:3px}
+.pref-opt-desc{font-size:9px;color:var(--t3);display:block}
+.pref-opt.selected .pref-opt-desc{color:var(--amber-dim);filter:brightness(1.8)}
+.modal-confirm{width:100%;background:var(--amber);border:none;color:#000;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.12em;padding:11px;border-radius:var(--r);cursor:pointer;transition:all .15s;margin-top:4px}
+.modal-confirm:hover{background:#ffb800}
+.modal-confirm:disabled{background:var(--t3);color:var(--bg);cursor:default}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -160,25 +141,12 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex
         <span class="logo-hex">&#11041;</span>
         <span class="logo-text">RAG CHAT</span>
       </div>
-      <button class="btn-new" onclick="newChat()">&#xff0b; &nbsp;New Chat</button>
+      <button class="btn-new" onclick="newChat()">&#xff0b;&nbsp; New Chat</button>
     </div>
 
     <div class="chat-list" id="chatList"></div>
 
     <div class="pref-section" id="prefSection"></div>
-
-    <div class="sidebar-bottom">
-      <div>
-        <div class="field-label">MODEL</div>
-        <input class="sb-input model" id="modelInput" value="llama3" placeholder="llama3"/>
-      </div>
-      <div>
-        <div class="field-label">ENDPOINT</div>
-        <input class="sb-input" id="endpointInput"
-               value="http://localhost:11434/v1/chat/completions"
-               placeholder="http://localhost:11434/v1/chat/completions"/>
-      </div>
-    </div>
   </aside>
 
   <main class="main">
@@ -206,148 +174,94 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex
       <span class="modal-hex">&#11041;</span>
       <div>
         <div class="modal-title">CONFIGURE PREFERENCES</div>
-        <div class="modal-subtitle">personalise how the model responds</div>
+        <div class="modal-subtitle">choose your answer style</div>
       </div>
     </div>
-
-    <div class="modal-steps">
-      <div class="step active" id="step1">
-        <div class="step-label">Step 1 of 3 &nbsp;&middot;&nbsp; Complexity</div>
-        <div class="step-question">How should the model explain things?</div>
-        <div class="opt-grid">
-          <button class="opt-btn" data-pref="complexity" data-val="simple" onclick="selectOpt(this)">
-            <span class="opt-icon">&#9678;</span>
-            <span class="opt-label">Simple</span>
-            <span class="opt-desc">Plain language,<br>no jargon</span>
-          </button>
-          <button class="opt-btn" data-pref="complexity" data-val="technical" onclick="selectOpt(this)">
-            <span class="opt-icon">&lt;/&gt;</span>
-            <span class="opt-label">Technical</span>
-            <span class="opt-desc">Precise terms,<br>full depth</span>
-          </button>
-        </div>
+    <div class="modal-body">
+      <div class="pref-question">How do you want answers?</div>
+      <div class="pref-grid cols2" id="prefOpts">
+        <button class="pref-opt" data-val="short and simple" onclick="selectPref(this)">
+          <span class="pref-opt-name">Short &amp; Simple</span>
+          <span class="pref-opt-desc">Plain language, concise</span>
+        </button>
+        <button class="pref-opt" data-val="short and technical" onclick="selectPref(this)">
+          <span class="pref-opt-name">Short &amp; Technical</span>
+          <span class="pref-opt-desc">Precise terms, concise</span>
+        </button>
+        <button class="pref-opt" data-val="step_by_step" onclick="selectPref(this)" style="grid-column:1/-1">
+          <span class="pref-opt-name">Step by Step</span>
+          <span class="pref-opt-desc">Numbered, structured flow</span>
+        </button>
+        <button class="pref-opt" data-val="long and simple" onclick="selectPref(this)">
+          <span class="pref-opt-name">Long &amp; Simple</span>
+          <span class="pref-opt-desc">Plain language, thorough</span>
+        </button>
+        <button class="pref-opt" data-val="long and technical" onclick="selectPref(this)">
+          <span class="pref-opt-name">Long &amp; Technical</span>
+          <span class="pref-opt-desc">Full depth, detailed</span>
+        </button>
       </div>
-
-      <div class="step" id="step2">
-        <div class="step-label">Step 2 of 3 &nbsp;&middot;&nbsp; Length</div>
-        <div class="step-question">How long should answers be?</div>
-        <div class="opt-grid">
-          <button class="opt-btn" data-pref="length" data-val="short" onclick="selectOpt(this)">
-            <span class="opt-icon">&#9644;</span>
-            <span class="opt-label">Short</span>
-            <span class="opt-desc">Concise,<br>to the point</span>
-          </button>
-          <button class="opt-btn" data-pref="length" data-val="long" onclick="selectOpt(this)">
-            <span class="opt-icon">&#9646;</span>
-            <span class="opt-label">Long</span>
-            <span class="opt-desc">Thorough,<br>full coverage</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="step" id="step3">
-        <div class="step-label">Step 3 of 3 &nbsp;&middot;&nbsp; Format</div>
-        <div class="step-question">Do you prefer step-by-step answers?</div>
-        <div class="opt-grid">
-          <button class="opt-btn" data-pref="stepbystep" data-val="yes" onclick="selectOpt(this)">
-            <span class="opt-icon">1.</span>
-            <span class="opt-label">Step-by-step</span>
-            <span class="opt-desc">Numbered,<br>structured flow</span>
-          </button>
-          <button class="opt-btn" data-pref="stepbystep" data-val="no" onclick="selectOpt(this)">
-            <span class="opt-icon">&para;</span>
-            <span class="opt-label">Prose</span>
-            <span class="opt-desc">Free-form,<br>narrative style</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="step-progress">
-        <div class="prog-dot done" id="dot1"></div>
-        <div class="prog-dot" id="dot2"></div>
-        <div class="prog-dot" id="dot3"></div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-modal-back" id="modalBack" onclick="modalBack()" disabled>&larr; Back</button>
-      <button class="btn-modal-next" id="modalNext" onclick="modalNext()" disabled>Next &rarr;</button>
+      <button class="modal-confirm" id="modalConfirm" onclick="confirmPref()" disabled>Confirm</button>
     </div>
   </div>
 </div>
 
-<script>
-const STORE_KEY = "ragchat_sessions";
-const PREF_KEY  = "ragchat_preferences";
+<!-- KaTeX for LaTeX rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
-// ── Pref state ────────────────────────────────────────────────────────────────
-let preferences = { complexity: null, length: null, stepbystep: null };
-let modalStep = 1;
-const PREF_LABELS = {
-  complexity: { simple:'Simple', technical:'Technical' },
-  length:     { short:'Short',   long:'Long' },
-  stepbystep: { yes:'Step-by-step', no:'Prose' },
+<script>
+const ENDPOINT  = "http://localhost:5000/api/getResponse";
+const STORE_KEY = "ragchat_sessions";
+const PREF_KEY  = "ragchat_preference";
+
+const PREF_DISPLAY = {
+  "short and simple":    "Short & Simple",
+  "short and technical": "Short & Technical",
+  "step_by_step":        "Step by Step",
+  "long and simple":     "Long & Simple",
+  "long and technical":  "Long & Technical",
 };
 
-function loadPrefs() {
-  try { const r = localStorage.getItem(PREF_KEY); if (r) { preferences = JSON.parse(r); return true; } } catch {}
+// ── Preference ────────────────────────────────────────────────────────────────
+let preference = null;
+
+function loadPref() {
+  try { const r = localStorage.getItem(PREF_KEY); if (r) { preference = r; return true; } } catch {}
   return false;
 }
-function savePrefs() { localStorage.setItem(PREF_KEY, JSON.stringify(preferences)); }
+function savePref() { localStorage.setItem(PREF_KEY, preference); }
 
 function openModal() {
-  modalStep = 1;
-  showStep(1);
   document.getElementById('modalOverlay').classList.remove('hidden');
-  ['complexity','length','stepbystep'].forEach(p => {
-    document.querySelectorAll('[data-pref="'+p+'"]').forEach(b => {
-      b.classList.toggle('selected', b.dataset.val === preferences[p]);
-    });
+  // Re-highlight current selection
+  document.querySelectorAll('.pref-opt').forEach(b => {
+    b.classList.toggle('selected', b.dataset.val === preference);
   });
-  updateModalBtns();
+  document.getElementById('modalConfirm').disabled = !preference;
 }
-function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
-
-function showStep(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById('step'+i).classList.toggle('active', i===n);
-    document.getElementById('dot'+i).classList.toggle('done', i<=n);
-  });
-}
-function selectOpt(btn) {
-  const p = btn.dataset.pref;
-  document.querySelectorAll('[data-pref="'+p+'"]').forEach(b => b.classList.remove('selected'));
+function selectPref(btn) {
+  document.querySelectorAll('.pref-opt').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  preferences[p] = btn.dataset.val;
-  updateModalBtns();
+  preference = btn.dataset.val;
+  document.getElementById('modalConfirm').disabled = false;
 }
-function updateModalBtns() {
-  const keys = ['complexity','length','stepbystep'];
-  const chosen = preferences[keys[modalStep-1]] !== null;
-  const next = document.getElementById('modalNext');
-  next.disabled = !chosen;
-  next.textContent = modalStep === 3 ? 'Confirm \u2713' : 'Next \u2192';
-  document.getElementById('modalBack').disabled = modalStep === 1;
-}
-function modalNext() {
-  if (modalStep < 3) { modalStep++; showStep(modalStep); updateModalBtns(); }
-  else { savePrefs(); closeModal(); renderPrefBadge(); }
-}
-function modalBack() {
-  if (modalStep > 1) { modalStep--; showStep(modalStep); updateModalBtns(); }
+function confirmPref() {
+  savePref();
+  document.getElementById('modalOverlay').classList.add('hidden');
+  renderPrefBadge();
 }
 function renderPrefBadge() {
   const sec = document.getElementById('prefSection');
   sec.style.display = 'block';
   sec.innerHTML =
-    '<div style="font-size:9px;letter-spacing:.14em;color:var(--t3);margin-bottom:7px">PREFERENCES</div>' +
-    '<div class="pref-badge"><span>complexity</span><span>'+(PREF_LABELS.complexity[preferences.complexity]||'--')+'</span></div>' +
-    '<div class="pref-badge"><span>length</span><span>'+(PREF_LABELS.length[preferences.length]||'--')+'</span></div>' +
-    '<div class="pref-badge"><span>format</span><span>'+(PREF_LABELS.stepbystep[preferences.stepbystep]||'--')+'</span></div>' +
-    '<button class="pref-edit-btn" onclick="openModal()">\u2699 Edit preferences</button>';
+    '<div style="font-size:9px;letter-spacing:.14em;color:var(--t3);margin-bottom:7px">PREFERENCE</div>' +
+    '<div class="pref-badge"><span>style</span><span>' + (PREF_DISPLAY[preference] || preference) + '</span></div>' +
+    '<button class="pref-edit-btn" onclick="openModal()">\u2699 Change style</button>';
 }
 
-// ── Session state ─────────────────────────────────────────────────────────────
+// ── Sessions ──────────────────────────────────────────────────────────────────
 let sessions = {};
 let activeChatId = null;
 let loading = false;
@@ -363,8 +277,9 @@ function load() {
   } catch { sessions = {}; activeChatId = null; }
 }
 
-function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function fmtTs(ms) {
+function genId()    { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtTs(ms)  {
   const d = new Date(ms);
   return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
 }
@@ -373,7 +288,6 @@ function fmtDate(ms) {
   return d.toDateString()===now.toDateString() ? fmtTs(ms).slice(0,5) : (d.getMonth()+1)+'/'+d.getDate();
 }
 function titleFrom(msg) { const s = msg.trim().replace(/\s+/g,' '); return s.length>32 ? s.slice(0,32)+'\u2026' : s; }
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function newChat() {
   const id = genId();
@@ -405,7 +319,7 @@ function renderMessages() {
   const wrap = document.getElementById('messages');
   const sub  = document.getElementById('topbarSub');
   if (!activeChatId || !sessions[activeChatId]) {
-    wrap.innerHTML = '<div class="empty"><div class="empty-hex">&#11041;</div><div class="empty-text">No chat selected.<br>Start a new session</div></div>';
+    wrap.innerHTML = '<div class="empty"><div class="empty-hex">&#11041;</div><div class="empty-text">No chat selected.<br>Start a new session.</div></div>';
     sub.textContent = 'no session'; return;
   }
   const session = sessions[activeChatId];
@@ -414,16 +328,33 @@ function renderMessages() {
     wrap.innerHTML = '<div class="empty"><div class="empty-hex">&#11041;</div><div class="empty-text">Session ready.<br>Send a message to begin.</div></div>';
     return;
   }
-  wrap.innerHTML = session.messages.map(m =>
-    '<div class="msg '+(m.role==='user'?'user':'bot')+' '+(m.isErr?'err':'')+'">' +
-      '<div class="msg-header">' +
-        '<span class="msg-role">'+(m.role==='user'?'\u25b6 you':'\u25c8 model')+'</span>' +
-        (m.contextUsed ? '<span class="msg-rag">&#11041; RAG</span>' : '') +
-        '<span class="msg-ts">'+fmtTs(m.ts)+'</span>' +
-      '</div>' +
-      '<div class="msg-body">'+escHtml(m.content)+'</div>' +
-    '</div>'
-  ).join('');
+    wrap.innerHTML = session.messages.map(m =>
+      '<div class="msg '+(m.role==='user'?'user':'bot')+' '+(m.isErr?'err':'')+'">' +
+        '<div class="msg-header">' +
+          '<span class="msg-role">'+(m.role==='user'?'▶ you':'◈ model')+'</span>' +
+          '<span class="msg-ts">'+fmtTs(m.ts)+'</span>' +
+        '</div>' +
+        '<div class="msg-body">'+escHtml(m.content)+'</div>' +
+      '</div>'
+    ).join('');
+
+    // If KaTeX auto-render is available, render LaTeX within message bodies.
+    if (window.renderMathInElement) {
+      document.querySelectorAll('.msg-body').forEach(el => {
+        try {
+          renderMathInElement(el, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false}
+            ],
+            throwOnError: false
+          });
+        } catch (e) { /* ignore rendering errors */ }
+      });
+    }
+
   wrap.scrollTop = wrap.scrollHeight;
 }
 
@@ -431,7 +362,11 @@ function appendTyping() {
   const wrap = document.getElementById('messages');
   const el = document.createElement('div');
   el.className = 'typing-wrap'; el.id = 'typingIndicator';
-  el.innerHTML = '<div class="msg-header" style="font-size:10px;letter-spacing:.1em;gap:9px"><span class="msg-role" style="color:var(--amber);font-weight:600">\u25c8 model</span></div><div class="typing"><span></span><span></span><span></span></div>';
+  el.innerHTML =
+    '<div class="msg-header" style="font-size:10px;letter-spacing:.1em;gap:9px">' +
+      '<span class="msg-role" style="color:var(--amber);font-weight:600">\u25c8 model</span>' +
+    '</div>' +
+    '<div class="typing"><span></span><span></span><span></span></div>';
   wrap.appendChild(el);
   wrap.scrollTop = wrap.scrollHeight;
 }
@@ -448,7 +383,8 @@ async function sendMessage() {
   const session = sessions[activeChatId];
   if (session.title === 'New chat') session.title = titleFrom(text);
 
-  const lastUserMsg = [...session.messages].reverse().find(m => m.role==='user')?.content || '';
+  // lastMessage = the last LLM response (not user message)
+  const lastLLMMsg = [...session.messages].reverse().find(m => m.role === 'assistant')?.content || '';
 
   session.messages.push({ role:'user', content:text, ts:Date.now() });
   input.value = ''; input.style.height = 'auto';
@@ -456,63 +392,25 @@ async function sendMessage() {
   setLoading(true); appendTyping();
 
   try {
-    const endpoint = document.getElementById('endpointInput').value.trim() || 'http://localhost:11434/v1/chat/completions';
-    const model    = document.getElementById('modelInput').value.trim() || 'llama3';
-
-    // Build system prompt from preferences
-    const systemPrompt = [
-      'Complexity level: ' + (preferences.complexity || 'technical') + '.',
-      'Answer length: ' + (preferences.length || 'long') + '.',
-      preferences.stepbystep === 'yes' ? 'Format your answer as numbered steps.' : 'Use prose format.',
-    ].join(' ');
-
-    // Build full conversation history for context
-    const history = session.messages
-      .slice(0, -1)
-      .map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
-
-    // Detect if talking directly to Ollama or a custom Flask backend
-    const isOpenAIShape = endpoint.includes('/v1/chat/completions') || endpoint.includes('11434');
-
-    let body;
-    if (isOpenAIShape) {
-      body = JSON.stringify({
-        model,
-        messages: [
-          { role:'system', content: systemPrompt },
-          ...history,
-          { role:'user', content: text }
-        ],
-        stream: false
-      });
-    } else {
-      // Flask backend shape
-      body = JSON.stringify({
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         chatId:      activeChatId,
         message:     text,
-        lastMessage: lastUserMsg,
-        preference:  preferences
-      });
-    }
-
-    const res = await fetch(endpoint, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body
+        preference:  preference,
+        lastMessage: lastLLMMsg
+      })
     });
 
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' \u2014 is Ollama running with CORS open?\nRun: OLLAMA_ORIGINS="*" ollama serve');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
-    // Parse all possible response shapes
-    let reply;
-    if (data.choices?.[0]?.message?.content)  reply = data.choices[0].message.content;  // Ollama /v1/
-    else if (data.message?.content)            reply = data.message.content;              // Ollama /api/chat
-    else if (data.response)                    reply = data.response;                     // Ollama /api/generate
-    else if (data.llmResponse)                 reply = data.llmResponse;                  // Flask
-    else                                       reply = JSON.stringify(data, null, 2);
-
-    session.messages.push({ role:'assistant', content:reply, ts:Date.now(), contextUsed:!!data.contextUsed });
+    session.messages.push({
+      role: 'assistant',
+      content: data.llmResponse || JSON.stringify(data),
+      ts: Date.now()
+    });
 
   } catch(err) {
     session.messages.push({ role:'assistant', content:'\u26a0 ' + err.message, ts:Date.now(), isErr:true });
@@ -537,7 +435,7 @@ document.getElementById('chatInput').addEventListener('keydown', function(e) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 load();
-const hasPrefs = loadPrefs();
+const hasPrefs = loadPref();
 if (!hasPrefs) { openModal(); } else { renderPrefBadge(); }
 if (!activeChatId || !sessions[activeChatId]) newChat();
 else { renderSidebar(); renderMessages(); }
