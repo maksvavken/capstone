@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RAG Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:        #0c0e11;
+  --bg-s:      #101316;
+  --bg-e:      #161b21;
+  --border:    #1e2530;
+  --border-d:  #131720;
+  --amber:     #e8a000;
+  --amber-dim: rgba(232,160,0,0.10);
+  --cyan:      #00bcd4;
+  --green:     #2ea043;
+  --red:       #e05252;
+  --t1: #dde1e7;
+  --t2: #5a6475;
+  --t3: #2a3140;
+  --r: 4px;
+  --sidebar: 240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg-s);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-top{padding:20px 16px 16px;border-bottom:1px solid var(--border-d);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.logo-hex{font-size:22px;color:var(--amber);filter:drop-shadow(0 0 6px var(--amber))}
+.logo-text{font-size:13px;font-weight:600;letter-spacing:.1em;color:var(--t1)}
+.btn-new{width:100%;background:transparent;border:1px solid var(--border);color:var(--t2);font-family:inherit;font-size:11px;letter-spacing:.08em;padding:8px;border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-new:hover{border-color:var(--amber-dim);color:var(--amber);background:var(--amber-dim)}
+.chat-list{flex:1;overflow-y:auto;padding:8px}
+.chat-list::-webkit-scrollbar{width:3px}
+.chat-list::-webkit-scrollbar-thumb{background:var(--border)}
+.chat-item{padding:10px 12px;border-radius:var(--r);cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:all .12s;position:relative}
+.chat-item:hover{background:var(--bg-e);border-color:var(--border)}
+.chat-item.active{background:var(--bg-e);border-color:var(--amber-dim)}
+.chat-item.active .ci-title{color:var(--amber)}
+.ci-title{font-size:12px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.ci-meta{font-size:10px;color:var(--t3);margin-top:2px;display:flex;gap:8px}
+.ci-delete{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;opacity:0;transition:opacity .12s;padding:2px 4px}
+.chat-item:hover .ci-delete{opacity:1}
+.ci-delete:hover{color:var(--red)!important;opacity:1!important}
+
+/* Sidebar bottom */
+.sidebar-bottom{padding:12px 16px;border-top:1px solid var(--border-d);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.field-label{font-size:9px;letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
+.sb-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--cyan);font-family:inherit;font-size:10px;padding:6px 8px;border-radius:var(--r);outline:none}
+.sb-input:focus{border-color:var(--cyan)}
+.sb-input.model{color:var(--amber)}
+.sb-input.model:focus{border-color:var(--amber)}
+
+/* Pref badge */
+.pref-section{padding:12px 16px;border-top:1px solid var(--border-d);flex-shrink:0;display:none}
+.pref-badge{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--t2);padding:3px 0}
+.pref-badge span:last-child{color:var(--amber);font-weight:500}
+.pref-edit-btn{width:100%;margin-top:8px;background:transparent;border:1px solid var(--border-d);color:var(--t3);font-family:inherit;font-size:10px;letter-spacing:.07em;padding:6px;border-radius:var(--r);cursor:pointer;transition:all .15s}
+.pref-edit-btn:hover{border-color:var(--amber-dim);color:var(--amber);background:var(--amber-dim)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-s);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-title{font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--amber)}
+.topbar-sub{font-size:10px;color:var(--t3);letter-spacing:.06em}
+.status{width:7px;height:7px;border-radius:50%;background:var(--t3);margin-left:auto;transition:all .2s}
+.status.on{background:var(--green);box-shadow:0 0 7px var(--green);animation:blink 1s ease-in-out infinite}
+
+/* Messages */
+.messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.messages::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb{background:var(--border)}
+.empty{margin:auto;text-align:center;color:var(--t3);display:flex;flex-direction:column;align-items:center;gap:14px}
+.empty-hex{font-size:36px;opacity:.3}
+.empty-text{font-size:12px;letter-spacing:.06em;line-height:1.9}
+.msg{display:flex;flex-direction:column;gap:5px;animation:fadeUp .16s ease;max-width:780px}
+.msg.user{align-self:flex-end}
+.msg.bot{align-self:flex-start}
+.msg-header{display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:.1em}
+.msg-role{font-weight:600}
+.msg.user .msg-role{color:var(--cyan)}
+.msg.bot .msg-role{color:var(--amber)}
+.msg.err .msg-role{color:var(--red)}
+.msg-rag{font-size:9px;color:var(--green);border:1px solid var(--green);padding:1px 5px;border-radius:2px;letter-spacing:.06em;opacity:.75}
+.msg-ts{color:var(--t3);font-size:10px;margin-left:auto}
+.msg-body{padding:11px 15px;border-radius:var(--r);font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.msg.user .msg-body{background:var(--bg-e);border:1px solid var(--border);border-top-right-radius:2px}
+.msg.bot .msg-body{background:var(--bg-s);border:1px solid var(--border);border-top-left-radius:2px}
+.msg.err .msg-body{border-color:var(--red);color:var(--red)}
+.typing-wrap{align-self:flex-start;display:flex;flex-direction:column;gap:5px}
+.typing{display:flex;gap:5px;padding:13px 15px;background:var(--bg-s);border:1px solid var(--border);border-radius:var(--r);border-top-left-radius:2px;width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:bounce 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+
+/* Footer */
+.footer{padding:14px 24px 18px;border-top:1px solid var(--border);background:var(--bg-s);flex-shrink:0}
+.input-row{display:flex;align-items:flex-end;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;transition:border-color .15s}
+.input-row:focus-within{border-color:var(--amber)}
+.input-prompt{color:var(--amber);font-size:16px;flex-shrink:0;line-height:1.5;padding-bottom:1px}
+.chat-input{flex:1;background:none;border:none;outline:none;resize:none;color:var(--t1);font-family:inherit;font-size:13px;line-height:1.6;max-height:140px;overflow-y:auto}
+.chat-input::placeholder{color:var(--t3)}
+.btn-send{background:none;border:none;color:var(--t2);font-family:inherit;font-size:18px;cursor:pointer;transition:color .15s;flex-shrink:0;padding:0 2px;line-height:1}
+.btn-send:hover:not(:disabled){color:var(--amber)}
+.btn-send:disabled{opacity:.3;cursor:default}
+.footer-hint{font-size:9px;color:var(--t3);letter-spacing:.08em;margin-top:7px;text-align:right}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px);animation:fadeIn .2s ease}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--bg-s);border:1px solid var(--border);border-radius:6px;width:480px;max-width:calc(100vw - 32px);animation:slideUp .22s ease;overflow:hidden}
+.modal-header{padding:22px 24px 18px;border-bottom:1px solid var(--border-d);display:flex;align-items:center;gap:10px}
+.modal-hex{font-size:20px;color:var(--amber);filter:drop-shadow(0 0 5px var(--amber))}
+.modal-title{font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--t1)}
+.modal-subtitle{font-size:10px;color:var(--t3);letter-spacing:.06em;margin-top:2px}
+.modal-steps{padding:0 24px 20px}
+.step{display:none;animation:fadeUp .18s ease}
+.step.active{display:block}
+.step-label{font-size:9px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin:20px 0 12px}
+.step-question{font-size:13px;color:var(--t1);margin-bottom:16px;line-height:1.6}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt-btn{background:var(--bg);border:1px solid var(--border);color:var(--t2);font-family:inherit;font-size:11px;letter-spacing:.05em;padding:14px 12px;border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.opt-btn:hover{border-color:var(--amber-dim);color:var(--t1);background:var(--bg-e)}
+.opt-btn.selected{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.opt-icon{font-size:18px}
+.opt-label{font-size:11px;font-weight:500}
+.opt-desc{font-size:9px;color:var(--t3);line-height:1.4}
+.opt-btn.selected .opt-desc{color:var(--amber-dim);filter:brightness(2)}
+.step-progress{display:flex;gap:5px;margin:18px 0 4px}
+.prog-dot{height:2px;flex:1;background:var(--border);border-radius:1px;transition:background .2s}
+.prog-dot.done{background:var(--amber)}
+.modal-footer{padding:14px 24px 20px;display:flex;justify-content:space-between;align-items:center}
+.btn-modal-back{background:none;border:none;color:var(--t3);font-family:inherit;font-size:11px;cursor:pointer;padding:0;transition:color .15s}
+.btn-modal-back:hover{color:var(--t1)}
+.btn-modal-back:disabled{opacity:.2;cursor:default}
+.btn-modal-next{background:var(--amber);border:none;color:#000;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.1em;padding:9px 20px;border-radius:var(--r);cursor:pointer;transition:all .15s}
+.btn-modal-next:hover{background:#ffb800}
+.btn-modal-next:disabled{background:var(--t3);color:var(--bg);cursor:default}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <span class="logo-hex">&#11041;</span>
+        <span class="logo-text">RAG CHAT</span>
+      </div>
+      <button class="btn-new" onclick="newChat()">&#xff0b; &nbsp;New Chat</button>
+    </div>
+
+    <div class="chat-list" id="chatList"></div>
+
+    <div class="pref-section" id="prefSection"></div>
+
+    <div class="sidebar-bottom">
+      <div>
+        <div class="field-label">MODEL</div>
+        <input class="sb-input model" id="modelInput" value="llama3" placeholder="llama3"/>
+      </div>
+      <div>
+        <div class="field-label">ENDPOINT</div>
+        <input class="sb-input" id="endpointInput"
+               value="http://localhost:11434/v1/chat/completions"
+               placeholder="http://localhost:11434/v1/chat/completions"/>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title">INFERENCE TERMINAL</span>
+      <span class="topbar-sub" id="topbarSub">no session</span>
+      <span class="status" id="statusDot"></span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="footer">
+      <div class="input-row">
+        <span class="input-prompt">&rsaquo;</span>
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Enter query&hellip;"></textarea>
+        <button class="btn-send" id="sendBtn" onclick="sendMessage()">&#9166;</button>
+      </div>
+      <div class="footer-hint">shift+enter for newline &nbsp;&middot;&nbsp; enter to send</div>
+    </div>
+  </main>
+</div>
+
+<!-- Preference Modal -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-hex">&#11041;</span>
+      <div>
+        <div class="modal-title">CONFIGURE PREFERENCES</div>
+        <div class="modal-subtitle">personalise how the model responds</div>
+      </div>
+    </div>
+
+    <div class="modal-steps">
+      <div class="step active" id="step1">
+        <div class="step-label">Step 1 of 3 &nbsp;&middot;&nbsp; Complexity</div>
+        <div class="step-question">How should the model explain things?</div>
+        <div class="opt-grid">
+          <button class="opt-btn" data-pref="complexity" data-val="simple" onclick="selectOpt(this)">
+            <span class="opt-icon">&#9678;</span>
+            <span class="opt-label">Simple</span>
+            <span class="opt-desc">Plain language,<br>no jargon</span>
+          </button>
+          <button class="opt-btn" data-pref="complexity" data-val="technical" onclick="selectOpt(this)">
+            <span class="opt-icon">&lt;/&gt;</span>
+            <span class="opt-label">Technical</span>
+            <span class="opt-desc">Precise terms,<br>full depth</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="step" id="step2">
+        <div class="step-label">Step 2 of 3 &nbsp;&middot;&nbsp; Length</div>
+        <div class="step-question">How long should answers be?</div>
+        <div class="opt-grid">
+          <button class="opt-btn" data-pref="length" data-val="short" onclick="selectOpt(this)">
+            <span class="opt-icon">&#9644;</span>
+            <span class="opt-label">Short</span>
+            <span class="opt-desc">Concise,<br>to the point</span>
+          </button>
+          <button class="opt-btn" data-pref="length" data-val="long" onclick="selectOpt(this)">
+            <span class="opt-icon">&#9646;</span>
+            <span class="opt-label">Long</span>
+            <span class="opt-desc">Thorough,<br>full coverage</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="step" id="step3">
+        <div class="step-label">Step 3 of 3 &nbsp;&middot;&nbsp; Format</div>
+        <div class="step-question">Do you prefer step-by-step answers?</div>
+        <div class="opt-grid">
+          <button class="opt-btn" data-pref="stepbystep" data-val="yes" onclick="selectOpt(this)">
+            <span class="opt-icon">1.</span>
+            <span class="opt-label">Step-by-step</span>
+            <span class="opt-desc">Numbered,<br>structured flow</span>
+          </button>
+          <button class="opt-btn" data-pref="stepbystep" data-val="no" onclick="selectOpt(this)">
+            <span class="opt-icon">&para;</span>
+            <span class="opt-label">Prose</span>
+            <span class="opt-desc">Free-form,<br>narrative style</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="step-progress">
+        <div class="prog-dot done" id="dot1"></div>
+        <div class="prog-dot" id="dot2"></div>
+        <div class="prog-dot" id="dot3"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-back" id="modalBack" onclick="modalBack()" disabled>&larr; Back</button>
+      <button class="btn-modal-next" id="modalNext" onclick="modalNext()" disabled>Next &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = "ragchat_sessions";
+const PREF_KEY  = "ragchat_preferences";
+
+// ── Pref state ────────────────────────────────────────────────────────────────
+let preferences = { complexity: null, length: null, stepbystep: null };
+let modalStep = 1;
+const PREF_LABELS = {
+  complexity: { simple:'Simple', technical:'Technical' },
+  length:     { short:'Short',   long:'Long' },
+  stepbystep: { yes:'Step-by-step', no:'Prose' },
+};
+
+function loadPrefs() {
+  try { const r = localStorage.getItem(PREF_KEY); if (r) { preferences = JSON.parse(r); return true; } } catch {}
+  return false;
+}
+function savePrefs() { localStorage.setItem(PREF_KEY, JSON.stringify(preferences)); }
+
+function openModal() {
+  modalStep = 1;
+  showStep(1);
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  ['complexity','length','stepbystep'].forEach(p => {
+    document.querySelectorAll('[data-pref="'+p+'"]').forEach(b => {
+      b.classList.toggle('selected', b.dataset.val === preferences[p]);
+    });
+  });
+  updateModalBtns();
+}
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
+
+function showStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    document.getElementById('dot'+i).classList.toggle('done', i<=n);
+  });
+}
+function selectOpt(btn) {
+  const p = btn.dataset.pref;
+  document.querySelectorAll('[data-pref="'+p+'"]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  preferences[p] = btn.dataset.val;
+  updateModalBtns();
+}
+function updateModalBtns() {
+  const keys = ['complexity','length','stepbystep'];
+  const chosen = preferences[keys[modalStep-1]] !== null;
+  const next = document.getElementById('modalNext');
+  next.disabled = !chosen;
+  next.textContent = modalStep === 3 ? 'Confirm \u2713' : 'Next \u2192';
+  document.getElementById('modalBack').disabled = modalStep === 1;
+}
+function modalNext() {
+  if (modalStep < 3) { modalStep++; showStep(modalStep); updateModalBtns(); }
+  else { savePrefs(); closeModal(); renderPrefBadge(); }
+}
+function modalBack() {
+  if (modalStep > 1) { modalStep--; showStep(modalStep); updateModalBtns(); }
+}
+function renderPrefBadge() {
+  const sec = document.getElementById('prefSection');
+  sec.style.display = 'block';
+  sec.innerHTML =
+    '<div style="font-size:9px;letter-spacing:.14em;color:var(--t3);margin-bottom:7px">PREFERENCES</div>' +
+    '<div class="pref-badge"><span>complexity</span><span>'+(PREF_LABELS.complexity[preferences.complexity]||'--')+'</span></div>' +
+    '<div class="pref-badge"><span>length</span><span>'+(PREF_LABELS.length[preferences.length]||'--')+'</span></div>' +
+    '<div class="pref-badge"><span>format</span><span>'+(PREF_LABELS.stepbystep[preferences.stepbystep]||'--')+'</span></div>' +
+    '<button class="pref-edit-btn" onclick="openModal()">\u2699 Edit preferences</button>';
+}
+
+// ── Session state ─────────────────────────────────────────────────────────────
+let sessions = {};
+let activeChatId = null;
+let loading = false;
+
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify({sessions, activeChatId})); }
+function load() {
+  try {
+    const r = localStorage.getItem(STORE_KEY);
+    if (!r) return;
+    const d = JSON.parse(r);
+    sessions = d.sessions || {};
+    activeChatId = d.activeChatId || null;
+  } catch { sessions = {}; activeChatId = null; }
+}
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function fmtTs(ms) {
+  const d = new Date(ms);
+  return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+}
+function fmtDate(ms) {
+  const d = new Date(ms), now = new Date();
+  return d.toDateString()===now.toDateString() ? fmtTs(ms).slice(0,5) : (d.getMonth()+1)+'/'+d.getDate();
+}
+function titleFrom(msg) { const s = msg.trim().replace(/\s+/g,' '); return s.length>32 ? s.slice(0,32)+'\u2026' : s; }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function newChat() {
+  const id = genId();
+  sessions[id] = { id, title:'New chat', messages:[], createdAt:Date.now() };
+  activeChatId = id;
+  save(); renderSidebar(); renderMessages();
+}
+function switchChat(id) { activeChatId = id; save(); renderSidebar(); renderMessages(); }
+function deleteChat(id, e) {
+  e.stopPropagation();
+  delete sessions[id];
+  if (activeChatId === id) { const ids = Object.keys(sessions); activeChatId = ids.length ? ids[ids.length-1] : null; }
+  save(); renderSidebar(); renderMessages();
+}
+
+function renderSidebar() {
+  const list = document.getElementById('chatList');
+  const sorted = Object.values(sessions).sort((a,b) => b.createdAt - a.createdAt);
+  list.innerHTML = sorted.map(s =>
+    '<div class="chat-item '+(s.id===activeChatId?'active':'')+'" onclick="switchChat(\''+s.id+'\')">' +
+      '<div class="ci-title">'+escHtml(s.title)+'</div>' +
+      '<div class="ci-meta"><span>'+s.messages.filter(m=>m.role==='user').length+' msgs</span><span>'+fmtDate(s.createdAt)+'</span></div>' +
+      '<button class="ci-delete" onclick="deleteChat(\''+s.id+'\',event)" title="Delete">\u2715</button>' +
+    '</div>'
+  ).join('');
+}
+
+function renderMessages() {
+  const wrap = document.getElementById('messages');
+  const sub  = document.getElementById('topbarSub');
+  if (!activeChatId || !sessions[activeChatId]) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-hex">&#11041;</div><div class="empty-text">No chat selected.<br>Start a new session</div></div>';
+    sub.textContent = 'no session'; return;
+  }
+  const session = sessions[activeChatId];
+  sub.textContent = 'session \u00b7 ' + activeChatId;
+  if (!session.messages.length) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-hex">&#11041;</div><div class="empty-text">Session ready.<br>Send a message to begin.</div></div>';
+    return;
+  }
+  wrap.innerHTML = session.messages.map(m =>
+    '<div class="msg '+(m.role==='user'?'user':'bot')+' '+(m.isErr?'err':'')+'">' +
+      '<div class="msg-header">' +
+        '<span class="msg-role">'+(m.role==='user'?'\u25b6 you':'\u25c8 model')+'</span>' +
+        (m.contextUsed ? '<span class="msg-rag">&#11041; RAG</span>' : '') +
+        '<span class="msg-ts">'+fmtTs(m.ts)+'</span>' +
+      '</div>' +
+      '<div class="msg-body">'+escHtml(m.content)+'</div>' +
+    '</div>'
+  ).join('');
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function appendTyping() {
+  const wrap = document.getElementById('messages');
+  const el = document.createElement('div');
+  el.className = 'typing-wrap'; el.id = 'typingIndicator';
+  el.innerHTML = '<div class="msg-header" style="font-size:10px;letter-spacing:.1em;gap:9px"><span class="msg-role" style="color:var(--amber);font-weight:600">\u25c8 model</span></div><div class="typing"><span></span><span></span><span></span></div>';
+  wrap.appendChild(el);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+function removeTyping() { const el = document.getElementById('typingIndicator'); if (el) el.remove(); }
+
+// ── Send ──────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (loading) return;
+  const input = document.getElementById('chatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  if (!activeChatId) newChat();
+
+  const session = sessions[activeChatId];
+  if (session.title === 'New chat') session.title = titleFrom(text);
+
+  const lastUserMsg = [...session.messages].reverse().find(m => m.role==='user')?.content || '';
+
+  session.messages.push({ role:'user', content:text, ts:Date.now() });
+  input.value = ''; input.style.height = 'auto';
+  save(); renderSidebar(); renderMessages();
+  setLoading(true); appendTyping();
+
+  try {
+    const endpoint = document.getElementById('endpointInput').value.trim() || 'http://localhost:11434/v1/chat/completions';
+    const model    = document.getElementById('modelInput').value.trim() || 'llama3';
+
+    // Build system prompt from preferences
+    const systemPrompt = [
+      'Complexity level: ' + (preferences.complexity || 'technical') + '.',
+      'Answer length: ' + (preferences.length || 'long') + '.',
+      preferences.stepbystep === 'yes' ? 'Format your answer as numbered steps.' : 'Use prose format.',
+    ].join(' ');
+
+    // Build full conversation history for context
+    const history = session.messages
+      .slice(0, -1)
+      .map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+
+    // Detect if talking directly to Ollama or a custom Flask backend
+    const isOpenAIShape = endpoint.includes('/v1/chat/completions') || endpoint.includes('11434');
+
+    let body;
+    if (isOpenAIShape) {
+      body = JSON.stringify({
+        model,
+        messages: [
+          { role:'system', content: systemPrompt },
+          ...history,
+          { role:'user', content: text }
+        ],
+        stream: false
+      });
+    } else {
+      // Flask backend shape
+      body = JSON.stringify({
+        chatId:      activeChatId,
+        message:     text,
+        lastMessage: lastUserMsg,
+        preference:  preferences
+      });
+    }
+
+    const res = await fetch(endpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' \u2014 is Ollama running with CORS open?\nRun: OLLAMA_ORIGINS="*" ollama serve');
+    const data = await res.json();
+
+    // Parse all possible response shapes
+    let reply;
+    if (data.choices?.[0]?.message?.content)  reply = data.choices[0].message.content;  // Ollama /v1/
+    else if (data.message?.content)            reply = data.message.content;              // Ollama /api/chat
+    else if (data.response)                    reply = data.response;                     // Ollama /api/generate
+    else if (data.llmResponse)                 reply = data.llmResponse;                  // Flask
+    else                                       reply = JSON.stringify(data, null, 2);
+
+    session.messages.push({ role:'assistant', content:reply, ts:Date.now(), contextUsed:!!data.contextUsed });
+
+  } catch(err) {
+    session.messages.push({ role:'assistant', content:'\u26a0 ' + err.message, ts:Date.now(), isErr:true });
+  } finally {
+    removeTyping(); setLoading(false); save(); renderSidebar(); renderMessages();
+  }
+}
+
+function setLoading(v) {
+  loading = v;
+  document.getElementById('statusDot').className = 'status' + (v ? ' on' : '');
+  document.getElementById('sendBtn').disabled = v;
+}
+
+document.getElementById('chatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+});
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+load();
+const hasPrefs = loadPrefs();
+if (!hasPrefs) { openModal(); } else { renderPrefBadge(); }
+if (!activeChatId || !sessions[activeChatId]) newChat();
+else { renderSidebar(); renderMessages(); }
+</script>
+</body>
+</html>
