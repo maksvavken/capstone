@@ -20,7 +20,7 @@ COLLECTION_NAME = "math_qa"
 app = Flask(__name__)
 CORS(app)
 
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+#gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 # ---------------------------------------------------------------------------
