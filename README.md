@@ -1,6 +1,6 @@
 # MathTutor AI
 
-A math tutoring app powered by a fine-tuned LLaMA 3 model with RAG support. Users can input math questions and choose an explanation style.
+A math tutoring app powered by a fine-tuned Mistral 7B model with RAG support. Users can input math questions and choose an explanation style.
 
 ## Prerequisites
 
