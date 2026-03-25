@@ -8,7 +8,7 @@ load_dotenv()
 
 CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "math_qa"
-TARGET_COUNT = 1000
+TARGET_COUNT = 10000
 MIN_SCORE = 5
 
 # ---------------------------------------------------------------------------

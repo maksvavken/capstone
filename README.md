@@ -50,7 +50,7 @@ npm install
 Create a `.env` file in the `backend/` folder with the following structure:
 ```
 OLLAMA_URL=http://localhost:11434
-OLLAMA_MODEL=hf.co/malomorgen/finetuned-llama3-math-gguf
+OLLAMA_MODEL=hf.co/malomorgen/finetuned-llama3-math-gguf #Chose the model name you have
 ```
 
 ## Running the LLM Locally with Ollama
@@ -116,7 +116,6 @@ python init_chroma.py
 
 | Service  | URL                   |
 |----------|-----------------------|
-| Frontend | http://localhost:4200 |
 | Backend  | http://localhost:5000 |
 
 ## API Endpoints
