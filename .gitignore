@@ -41,6 +41,7 @@ venv/
 .venv/
 env/
 /backend/.env
+/backend/chroma_db
 
 # Flask
 instance/
